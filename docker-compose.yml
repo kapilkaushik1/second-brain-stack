@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  gateway:
+    build:
+      context: .
+      dockerfile: services/gateway/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/brain.db
+      - INGESTION_SERVICE_URL=http://ingestion:8001
+      - SEARCH_SERVICE_URL=http://search:8002
+      - KNOWLEDGE_SERVICE_URL=http://knowledge:8003
+      - CHAT_SERVICE_URL=http://chat:8004
+    volumes:
+      - ./storage:/data
+      - ./brain.yml:/app/brain.yml
+    depends_on:
+      - ingestion
+      - search
+      - knowledge
+      - chat
+    networks:
+      - brain-network
+
+  # Ingestion Service
+  ingestion:
+    build:
+      context: .
+      dockerfile: services/ingestion/Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/brain.db
+    volumes:
+      - ./storage:/data
+      - ./docs:/docs
+      - ./brain.yml:/app/brain.yml
+    networks:
+      - brain-network
+
+  # Search Service  
+  search:
+    build:
+      context: .
+      dockerfile: services/search/Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/brain.db
+    volumes:
+      - ./storage:/data
+      - ./brain.yml:/app/brain.yml
+    networks:
+      - brain-network
+
+  # Knowledge Graph Service
+  knowledge:
+    build:
+      context: .
+      dockerfile: services/knowledge/Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/brain.db
+    volumes:
+      - ./storage:/data
+      - ./brain.yml:/app/brain.yml
+    networks:
+      - brain-network
+
+  # Chat Service
+  chat:
+    build:
+      context: .
+      dockerfile: services/chat/Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/brain.db
+    volumes:
+      - ./storage:/data
+      - ./brain.yml:/app/brain.yml
+    networks:
+      - brain-network
+
+  # Web Interface
+  web:
+    build:
+      context: .
+      dockerfile: interfaces/web/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - GATEWAY_URL=http://gateway:8000
+    depends_on:
+      - gateway
+    networks:
+      - brain-network
+
+networks:
+  brain-network:
+    driver: bridge
+
+volumes:
+  brain-data:

@@ -1,6 +1,6 @@
 """SQLModel database models for the second brain stack."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
@@ -21,8 +21,8 @@ class DocumentBase(SQLModel):
     language: Optional[str] = Field(default="en", description="Detected language")
     
     # Timestamps
-    created_at: datetime = Field(default_factory=datetime.utcnow, description="Creation timestamp")
-    updated_at: datetime = Field(default_factory=datetime.utcnow, description="Last update timestamp")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="Creation timestamp")
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="Last update timestamp")
     indexed_at: Optional[datetime] = Field(default=None, description="Last indexing timestamp")
 
 
@@ -54,8 +54,8 @@ class EntityBase(SQLModel):
     mention_count: int = Field(default=1, description="Number of mentions across documents")
     
     # Timestamps
-    first_seen: datetime = Field(default_factory=datetime.utcnow, description="First seen timestamp")
-    last_seen: datetime = Field(default_factory=datetime.utcnow, description="Last seen timestamp")
+    first_seen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="First seen timestamp")
+    last_seen: datetime = Field(default_factory=lambda: datetime.now(timezone.utc), description="Last seen timestamp")
 
 
 class Entity(EntityBase, table=True):
@@ -113,8 +113,8 @@ class RelationshipBase(SQLModel):
     rel_metadata: Optional[str] = Field(default=None, description="JSON metadata")
     
     # Timestamps
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(datetime.UTC))
 
 
 class Relationship(RelationshipBase, table=True):

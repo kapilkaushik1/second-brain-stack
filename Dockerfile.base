@@ -1,0 +1,31 @@
+# Base image for all Second Brain services
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    sqlite3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY core/ ./core/
+COPY connectors/ ./connectors/
+COPY interfaces/ ./interfaces/
+COPY services/ ./services/
+
+# Install the package
+RUN pip install -e .
+
+# Create data directory
+RUN mkdir -p /data
+
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

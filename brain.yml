@@ -30,7 +30,7 @@ services:
 interfaces:
   cli:
     pager: "less"
-    editor: "$EDITOR"
+    editor: "nvim"
     colors: true
     
   web:
