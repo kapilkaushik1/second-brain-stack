@@ -1,0 +1,169 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  gateway:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.gateway
+    container_name: brain-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+    volumes:
+      - ../storage:/app/storage
+      - ../brain.yml:/app/brain.yml:ro
+    depends_on:
+      - ingestion
+      - search
+      - knowledge
+      - chat
+    networks:
+      - brain-network
+    restart: unless-stopped
+
+  # Ingestion Service
+  ingestion:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.service
+      args:
+        SERVICE_NAME: ingestion
+    container_name: brain-ingestion
+    ports:
+      - "8001:8001"
+    environment:
+      - SERVICE_NAME=ingestion
+      - SERVICE_PORT=8001
+      - DEBUG=true
+    volumes:
+      - ../storage:/app/storage
+      - ../brain.yml:/app/brain.yml:ro
+      # Mount directories for file system ingestion
+      - ~/documents:/data/documents:ro
+      - ~/Downloads:/data/downloads:ro
+    networks:
+      - brain-network
+    restart: unless-stopped
+
+  # Search Service
+  search:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.service
+      args:
+        SERVICE_NAME: search
+    container_name: brain-search
+    ports:
+      - "8002:8002"
+    environment:
+      - SERVICE_NAME=search
+      - SERVICE_PORT=8002
+      - DEBUG=true
+    volumes:
+      - ../storage:/app/storage
+      - ../brain.yml:/app/brain.yml:ro
+    networks:
+      - brain-network
+    restart: unless-stopped
+
+  # Knowledge Graph Service
+  knowledge:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.service
+      args:
+        SERVICE_NAME: knowledge
+    container_name: brain-knowledge
+    ports:
+      - "8003:8003"
+    environment:
+      - SERVICE_NAME=knowledge
+      - SERVICE_PORT=8003
+      - DEBUG=true
+    volumes:
+      - ../storage:/app/storage
+      - ../brain.yml:/app/brain.yml:ro
+    networks:
+      - brain-network
+    restart: unless-stopped
+
+  # Chat Service
+  chat:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.service
+      args:
+        SERVICE_NAME: chat
+    container_name: brain-chat
+    ports:
+      - "8004:8004"
+    environment:
+      - SERVICE_NAME=chat
+      - SERVICE_PORT=8004
+      - DEBUG=true
+    volumes:
+      - ../storage:/app/storage
+      - ../brain.yml:/app/brain.yml:ro
+    networks:
+      - brain-network
+    restart: unless-stopped
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: brain-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - brain-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: brain-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - brain-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: brain-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - brain-network
+    restart: unless-stopped
+
+networks:
+  brain-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  prometheus-data:
+  grafana-data:

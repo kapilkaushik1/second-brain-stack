@@ -1,0 +1,147 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "second-brain-stack"
+version = "0.1.0"
+description = "Ultimate self-hosted second brain with microservices architecture"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Second Brain Stack", email = "hello@secondbrain.dev"}
+]
+keywords = ["knowledge-management", "ai", "search", "microservices"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    # Core framework
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "pydantic>=2.4.0",
+    "sqlmodel>=0.0.14",
+    
+    # Database
+    "sqlite-utils>=3.35.0",
+    "alembic>=1.12.0",
+    
+    # Vector operations
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "sentence-transformers>=2.2.0",
+    
+    # NLP processing
+    "spacy>=3.7.0",
+    "transformers>=4.35.0",
+    "tokenizers>=0.15.0",
+    
+    # Web scraping
+    "scrapy>=2.11.0",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    
+    # CLI interfaces
+    "click>=8.1.0",
+    "rich>=13.6.0",
+    "textual>=0.41.0",
+    
+    # Utilities
+    "python-multipart>=0.0.6",
+    "python-jose[cryptography]>=3.3.0",
+    "passlib[bcrypt]>=1.7.0",
+    "aiofiles>=23.2.0",
+    "httpx>=0.25.0",
+    
+    # Configuration
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.1",
+    
+    # Async support
+    "asyncio-mqtt>=0.16.0",
+    "aioredis>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.9.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.6.0",
+    "pre-commit>=3.5.0",
+]
+
+performance = [
+    "orjson>=3.9.0",
+    "cython>=3.0.0",
+    "numba>=0.58.0",
+]
+
+monitoring = [
+    "prometheus-client>=0.18.0",
+    "structlog>=23.2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/second-brain-stack/second-brain-stack"
+Documentation = "https://docs.secondbrain.dev"
+Repository = "https://github.com/second-brain-stack/second-brain-stack"
+"Bug Tracker" = "https://github.com/second-brain-stack/second-brain-stack/issues"
+
+[project.scripts]
+brain = "interfaces.cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["core*", "services*", "interfaces*", "connectors*"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["core", "services", "interfaces", "connectors"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
+testpaths = [
+    "tests",
+]
+asyncio_mode = "auto"

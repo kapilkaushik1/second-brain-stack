@@ -1,0 +1,66 @@
+database:
+  path: "storage/brain.db"
+  wal_mode: true
+  fts_enabled: true
+  vector_extension: "sqlite-vec"
+
+services:
+  ingestion:
+    port: 8001
+    workers: 4
+    batch_size: 100
+    max_file_size: "50MB"
+  
+  search:
+    port: 8002
+    embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+    vector_dimensions: 384
+    similarity_threshold: 0.7
+  
+  knowledge:
+    port: 8003
+    entity_model: "en_core_web_sm"
+    min_confidence: 0.8
+    
+  chat:
+    port: 8004
+    context_window: 4000
+    memory_turns: 10
+
+interfaces:
+  cli:
+    pager: "less"
+    editor: "$EDITOR"
+    colors: true
+    
+  web:
+    port: 8000
+    debug: false
+    template_dir: "templates"
+    static_dir: "static"
+
+connectors:
+  filesystem:
+    supported_types: [".txt", ".md", ".pdf", ".docx", ".py", ".cpp", ".h"]
+    ignore_patterns: ["*.pyc", "__pycache__", ".git"]
+    
+  web:
+    user_agent: "SecondBrain/1.0"
+    timeout: 30
+    max_depth: 3
+    
+  git:
+    include_history: true
+    analyze_diffs: true
+    exclude_binaries: true
+
+embeddings:
+  model_path: "storage/models/"
+  cache_size: 1000
+  batch_size: 32
+  device: "cpu"
+
+logging:
+  level: "INFO"
+  structured: true
+  file_path: "logs/brain.log"

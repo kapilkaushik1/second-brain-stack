@@ -1,0 +1,19 @@
+# Logs directory for application logging
+logs/
+storage/brain.db*
+storage/cache/*
+storage/backups/*
+storage/models/*/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+.mypy_cache/
+.DS_Store
+*.log
