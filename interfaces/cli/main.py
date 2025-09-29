@@ -11,7 +11,8 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.prompt import Prompt
 
-from core.utils import get_logger, settings
+from core.utils import get_logger
+from core.utils.config import get_settings, Settings
 from core.database import DatabaseManager
 from core.embeddings import EmbeddingGenerator
 
@@ -36,13 +37,15 @@ def main(ctx: click.Context, config: Optional[str], debug: bool):
         ))
         return
     
-    # Configure settings
+    # Configure settings based on options
+    settings = get_settings()
+    
     if debug:
         settings.debug = True
     
     if config:
         # Load custom config
-        settings.from_yaml(config)
+        settings = Settings.from_yaml(config)
     
     # Create necessary directories
     settings.create_directories()
@@ -319,6 +322,8 @@ def config():
 @config.command()
 def show():
     """Show current configuration."""
+    settings = get_settings()
+    
     table = Table(show_header=True, header_style="bold magenta")
     table.add_column("Setting", style="cyan")
     table.add_column("Value", style="green")

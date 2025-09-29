@@ -1,10 +1,12 @@
-"""Test configuration and fixtures."""
+"""Pytest configuration and fixtures."""
 
 import asyncio
-import pytest
 import tempfile
 from pathlib import Path
 from typing import AsyncGenerator, Generator
+
+import pytest
+import pytest_asyncio
 
 from core.database import DatabaseManager
 from core.utils.config import Settings
@@ -21,84 +23,104 @@ def event_loop():
 @pytest.fixture
 def temp_dir() -> Generator[Path, None, None]:
     """Create a temporary directory for tests."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        yield Path(temp_dir)
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        yield Path(tmp_dir)
 
 
 @pytest.fixture
 def test_settings(temp_dir: Path) -> Settings:
-    """Create test settings with temporary paths."""
-    test_db_path = temp_dir / "test_brain.db"
+    """Create test settings with temporary directories."""
+    settings = Settings(
+        debug=True,
+        environment="test",
+        data_dir=str(temp_dir / "data"),
+        cache_dir=str(temp_dir / "cache"),
+        backup_dir=str(temp_dir / "backups"),
+    )
     
-    settings = Settings()
-    settings.database.path = str(test_db_path)
-    settings.data_dir = str(temp_dir / "data")
-    settings.cache_dir = str(temp_dir / "cache")
-    settings.backup_dir = str(temp_dir / "backups")
-    settings.debug = True
+    # Override database path for testing
+    settings.database.path = str(temp_dir / "test.db")
+    
+    # Create necessary directories
+    settings.create_directories()
     
     return settings
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_manager(test_settings: Settings) -> AsyncGenerator[DatabaseManager, None]:
     """Create a test database manager."""
-    db = DatabaseManager(f"sqlite+aiosqlite:///{test_settings.database.path}")
-    await db.create_tables()
+    db_manager = DatabaseManager(test_settings)
+    await db_manager.create_tables()
+    yield db_manager
+    await db_manager.close()
+
+
+@pytest_asyncio.fixture
+async def db_session(db_manager: DatabaseManager):
+    """Create a test database session.""" 
+    # For now, just return the db_manager since we don't have separate sessions implemented yet
+    yield db_manager
+
+
+# Test data fixtures
+@pytest.fixture
+def sample_text_files(temp_dir: Path) -> list[Path]:
+    """Create sample text files for testing."""
+    files = []
     
-    yield db
+    # Create some test files
+    test_files = [
+        ("test1.txt", "This is a test document about artificial intelligence."),
+        ("test2.md", "# Machine Learning\n\nThis document covers machine learning basics."),
+        ("test3.txt", "Natural language processing is fascinating."),
+        ("subdir/test4.txt", "Deep learning with neural networks."),
+    ]
     
-    # Cleanup
-    db_path = Path(test_settings.database.path)
-    if db_path.exists():
-        db_path.unlink()
+    for file_path, content in test_files:
+        full_path = temp_dir / file_path
+        full_path.parent.mkdir(parents=True, exist_ok=True)
+        full_path.write_text(content)
+        files.append(full_path)
+    
+    return files
 
 
 @pytest.fixture
 def sample_documents():
-    """Sample documents for testing."""
+    """Sample document data for testing."""
     return [
         {
-            "title": "Machine Learning Basics",
-            "content": "Machine learning is a subset of artificial intelligence that focuses on algorithms and statistical models.",
-            "source_type": "test",
-            "source_path": "/test/ml.txt"
+            "content": "Artificial intelligence is transforming technology.",
+            "title": "AI Overview",
+            "source_type": "text",
+            "source_path": "/test/ai.txt",
+            "metadata": {"author": "test_user"},
         },
         {
-            "title": "Python Programming", 
-            "content": "Python is a high-level programming language known for its simplicity and readability.",
-            "source_type": "test",
-            "source_path": "/test/python.txt"
+            "content": "Machine learning algorithms learn from data.",
+            "title": "ML Basics",
+            "source_type": "text", 
+            "source_path": "/test/ml.txt",
+            "metadata": {"category": "education"},
         },
-        {
-            "title": "Database Design",
-            "content": "Database design is the process of producing a detailed data model of a database.",
-            "source_type": "test", 
-            "source_path": "/test/db.txt"
-        }
     ]
 
 
+# API client fixtures for integration tests
 @pytest.fixture
-def sample_files(temp_dir: Path):
-    """Create sample files for testing."""
-    files_dir = temp_dir / "sample_files"
-    files_dir.mkdir(exist_ok=True)
-    
-    files = {}
-    
-    # Create test files
-    test_files = {
-        "document1.txt": "This is a test document about artificial intelligence and machine learning.",
-        "document2.md": "# Python Guide\n\nPython is a versatile programming language.",
-        "document3.py": "# Sample Python code\ndef hello_world():\n    print('Hello, World!')",
-        "ignored.pyc": "compiled python bytecode",  # Should be ignored
-        "README.md": "# Project README\n\nThis is a sample project."
-    }
-    
-    for filename, content in test_files.items():
-        file_path = files_dir / filename
-        file_path.write_text(content)
-        files[filename] = file_path
-    
-    return files_dir, files
+def api_base_url():
+    """Base URL for API tests."""
+    return "http://localhost:8000"
+
+
+@pytest.fixture
+def ingestion_api_url():
+    """Ingestion service URL."""
+    return "http://localhost:8001"
+
+
+@pytest.fixture
+def search_api_url():
+    """Search service URL."""
+    return "http://localhost:8002"

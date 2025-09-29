@@ -36,12 +36,13 @@ python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.0
 httpx>=0.25.0
 aiofiles>=23.2.0
+pyyaml>=6.0.0
 
 # Logging and monitoring
 structlog>=23.2.0
 pydantic-settings>=2.0.0
 
-# Development tools
+# Development and testing tools
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
 pytest-cov>=4.1.0

@@ -305,6 +305,68 @@ prune: fclean ## Prune all unused Docker resources
 # APPLICATION SPECIFIC TARGETS
 # ======================================================================================
 
+setup-dev: ## Setup development environment
+	@echo -e "$(BLUE)Setting up development environment...$(NC)"
+	python -m venv .venv || python3 -m venv .venv
+	.venv/bin/pip install --upgrade pip
+	.venv/bin/pip install -e .
+	.venv/bin/pip install -r requirements.txt
+	.venv/bin/python -m interfaces.cli db init
+	@echo -e "$(GREEN)Development environment ready! Activate with: source .venv/bin/activate$(NC)"
+
+brain: ## Start the full Second Brain stack
+	@echo -e "$(BLUE)🚀 Igniting Second Brain services... All systems GO!$(NC)"
+	@$(COMPOSE) up -d --build --remove-orphans
+	@echo -e "$(GREEN)Services are now running in detached mode.$(NC)"
+	@echo -e "$(YELLOW)🏥 Checking service health...$(NC)"
+	@sleep 3
+	@curl -s http://localhost:8000/health | jq . || echo "Gateway not ready yet..."
+	@echo -e "$(GREEN)✅ Gateway healthy$(NC)"
+	@for service in ingestion search knowledge chat; do \
+		if curl -s http://localhost:800$$(($(shell echo $$service | tr -d 'a-z' | wc -c) + 0))/health >/dev/null 2>&1; then \
+			echo -e "$(GREEN)✅ $$service service healthy$(NC)"; \
+		else \
+			echo -e "$(RED)❌ $$service service not responding$(NC)"; \
+		fi; \
+	done
+	@echo -e "$(BLUE)🧠 Second Brain Stack is now running!$(NC)"
+	@echo -e "$(BLUE)📊 Dashboard: http://localhost:8000/dashboard$(NC)"
+	@echo -e "$(BLUE)🔍 Search API: http://localhost:8002$(NC)" 
+	@echo -e "$(BLUE)💬 Chat API: http://localhost:8004$(NC)"
+
+cli: ## Show CLI usage examples
+	@echo -e "$(BLUE)🧠 Second Brain CLI Interface$(NC)"
+	@echo -e "Available endpoints:"
+	@echo -e "  Gateway: http://localhost:8000"
+	@echo -e "  Ingestion: http://localhost:8001"
+	@echo -e "  Search: http://localhost:8002"
+	@echo -e "  Knowledge: http://localhost:8003"
+	@echo -e "  Chat: http://localhost:8004"
+	@echo ""
+	@echo -e "Example commands:"
+	@echo -e "  curl -X POST http://localhost:8001/ingest -H 'Content-Type: application/json' -d '{\"content\":\"Hello World\",\"source_type\":\"test\",\"source_path\":\"test.txt\"}'"
+	@echo -e "  curl -X POST http://localhost:8002/search -H 'Content-Type: application/json' -d '{\"query\":\"hello\"}'"
+	@echo -e "  curl -X POST http://localhost:8004/message -H 'Content-Type: application/json' -d '{\"content\":\"What do you know?\"}'"
+
+test: ## Run all tests
+	@echo -e "$(YELLOW)Running tests...$(NC)"
+	.venv/bin/pytest tests/ -v --tb=short
+
+test-unit: ## Run unit tests only
+	@echo -e "$(YELLOW)Running unit tests...$(NC)"
+	.venv/bin/pytest tests/unit/ -v
+
+test-integration: ## Run integration tests
+	@echo -e "$(YELLOW)Running integration tests...$(NC)" 
+	.venv/bin/pytest tests/integration/ -v
+
+test-e2e: ## Run end-to-end tests
+	@echo -e "$(YELLOW)Running E2E tests...$(NC)"
+	@$(COMPOSE) up -d --build --remove-orphans
+	@sleep 5
+	.venv/bin/pytest tests/e2e/ -v
+	@$(COMPOSE) down
+
 app: brain ## Start the complete Second Brain application stack
 
 dev: up ## Start development environment  
