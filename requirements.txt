@@ -1,0 +1,52 @@
+# Core framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.4.0
+sqlmodel>=0.0.14
+
+# Database
+sqlite-utils>=3.35.0
+alembic>=1.12.0
+aiosqlite>=0.19.0
+sqlalchemy[asyncio]>=2.0.23
+
+# Vector operations
+numpy>=1.24.0
+scipy>=1.11.0
+sentence-transformers>=2.2.0
+
+# NLP processing
+spacy>=3.7.0
+transformers>=4.35.0
+tokenizers>=0.15.0
+
+# Web scraping
+scrapy>=2.11.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+
+# CLI interfaces
+click>=8.1.0
+rich>=13.6.0
+textual>=0.41.0
+
+# Utilities
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.0
+httpx>=0.25.0
+aiofiles>=23.2.0
+
+# Logging and monitoring
+structlog>=23.2.0
+pydantic-settings>=2.0.0
+
+# Development tools
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+black>=23.9.0
+isort>=5.12.0
+flake8>=6.1.0
+mypy>=1.6.0
+pre-commit>=3.5.0

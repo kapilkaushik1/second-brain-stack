@@ -119,13 +119,15 @@ async def start_ingestion(request: IngestionRequest, background_tasks: Backgroun
     )
 
 
-@app.get("/ingest/{task_id}/status", response_model=IngestionStatus)
-async def get_ingestion_status(task_id: str):
-    """Get status of ingestion task."""
-    if task_id not in ingestion_tasks:
-        raise HTTPException(status_code=404, detail="Task not found")
-    
-    return ingestion_tasks[task_id]
+@app.post("/documents")
+async def create_document_endpoint():
+    """Create document endpoint for compatibility."""
+    return {"message": "Use /ingest endpoint instead", "status": "deprecated"}
+
+@app.get("/status/{task_id}")
+async def get_task_status(task_id: str):
+    """Get status of ingestion task - alias for compatibility."""
+    return await get_ingestion_status(task_id)
 
 
 @app.get("/ingest/{task_id}/cancel")

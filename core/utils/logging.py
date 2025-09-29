@@ -4,7 +4,11 @@ import logging
 import sys
 from typing import Any, Dict, Optional
 
-import structlog
+try:
+    import structlog
+    HAS_STRUCTLOG = True
+except ImportError:
+    HAS_STRUCTLOG = False
 
 
 def configure_logging(
@@ -17,9 +21,12 @@ def configure_logging(
     # Configure standard library logging
     logging.basicConfig(
         level=getattr(logging, level.upper()),
-        format="%(message)s",
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s" if not HAS_STRUCTLOG else "%(message)s",
         stream=sys.stdout,
     )
+    
+    if not HAS_STRUCTLOG:
+        return
     
     processors = [
         structlog.contextvars.merge_contextvars,
@@ -58,37 +65,46 @@ def configure_logging(
         logging.getLogger().addHandler(file_handler)
 
 
-def get_logger(name: str) -> structlog.BoundLogger:
+def get_logger(name: str):
     """Get a structured logger instance."""
-    return structlog.get_logger(name)
+    if HAS_STRUCTLOG:
+        return structlog.get_logger(name)
+    else:
+        return logging.getLogger(name)
 
 
 class LoggerMixin:
     """Mixin to add logging capabilities to classes."""
     
     @property
-    def logger(self) -> structlog.BoundLogger:
+    def logger(self):
         """Get logger instance for this class."""
         return get_logger(self.__class__.__name__)
         
     def log_method_call(self, method_name: str, **kwargs: Any) -> None:
         """Log a method call with parameters."""
-        self.logger.debug(
-            "Method called",
-            method=method_name,
-            class_name=self.__class__.__name__,
-            **kwargs
-        )
+        if HAS_STRUCTLOG:
+            self.logger.debug(
+                "Method called",
+                method=method_name,
+                class_name=self.__class__.__name__,
+                **kwargs
+            )
+        else:
+            self.logger.debug(f"Method called: {method_name} in {self.__class__.__name__}")
     
     def log_error(self, error: Exception, context: Optional[Dict[str, Any]] = None) -> None:
         """Log an error with context."""
-        self.logger.error(
-            "Error occurred",
-            error_type=type(error).__name__,
-            error_message=str(error),
-            class_name=self.__class__.__name__,
-            **(context or {})
-        )
+        if HAS_STRUCTLOG:
+            self.logger.error(
+                "Error occurred",
+                error_type=type(error).__name__,
+                error_message=str(error),
+                class_name=self.__class__.__name__,
+                **(context or {})
+            )
+        else:
+            self.logger.error(f"Error in {self.__class__.__name__}: {error}")
 
 
 # Initialize logging with default configuration

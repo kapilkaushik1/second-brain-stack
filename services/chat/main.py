@@ -56,6 +56,17 @@ async def health_check():
     """Health check endpoint."""
     return {"status": "healthy", "service": "chat"}
 
+@app.get("/")
+async def root():
+    """Root endpoint for basic service info."""
+    return {"service": "chat", "version": "1.0.0", "status": "running"}
+
+@app.post("/chat")
+async def chat_endpoint(message: ChatMessage):
+    """Simple chat endpoint for compatibility."""
+    # Convert to message format and delegate
+    return await send_message(message)
+
 
 @app.post("/message", response_model=ChatResponse)
 async def send_message(message: ChatMessage):
