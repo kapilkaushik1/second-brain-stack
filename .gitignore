@@ -17,3 +17,19 @@ build/
 .mypy_cache/
 .DS_Store
 *.log
+
+# Temporary test files
+*_test.py
+test_*.py
+quick_test*
+simple_test*
+cli.py
+start_*.sh
+stop_*.sh
+run_*.sh
+
+# Status and temporary markdown files
+*STATUS.md
+FINAL_*.md
+VALIDATION_*.md
+TEST_REPORT.md

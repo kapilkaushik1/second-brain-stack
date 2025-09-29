@@ -234,19 +234,38 @@ backup-db: ## Backup database
 health: ## Check service health endpoints
 	@echo -e "$(GREEN)🏥 Checking service health...$(NC)"
 	@sleep 2
-	@python simple_test.py
+	@echo -n "Gateway: "; curl -s http://localhost:8000/health | jq -r '.status' 2>/dev/null || echo "DOWN"
+	@echo -n "Ingestion: "; curl -s http://localhost:8001/health | jq -r '.status' 2>/dev/null || echo "DOWN"
+	@echo -n "Search: "; curl -s http://localhost:8002/health | jq -r '.status' 2>/dev/null || echo "DOWN" 
+	@echo -n "Knowledge: "; curl -s http://localhost:8003/health | jq -r '.status' 2>/dev/null || echo "DOWN"
+	@echo -n "Chat: "; curl -s http://localhost:8004/health | jq -r '.status' 2>/dev/null || echo "DOWN"
 
-test-stack: ## Test the complete stack functionality 
+test-stack: ## Test the complete stack functionality using curl
 	@echo -e "$(GREEN)🧠 Testing Second Brain Stack...$(NC)"
-	@python simple_test.py
+	@echo "Testing ingestion..."
+	@curl -s -X POST http://localhost:8001/ingest -H "Content-Type: application/json" -d '{"content":"Test content","source_type":"test","source_path":"test.txt"}' | jq .
+	@echo "Testing search..."
+	@curl -s -X POST http://localhost:8002/search -H "Content-Type: application/json" -d '{"query":"test"}' | jq .
+	@echo "Testing chat..."
+	@curl -s -X POST http://localhost:8004/message -H "Content-Type: application/json" -d '{"content":"Hello"}' | jq .
 
 smoke: ## Run quick smoke test
 	@echo -e "$(YELLOW)🔥 Running smoke test...$(NC)"
-	@python cli.py health
+	@curl -s http://localhost:8000/health || echo "Gateway not responding"
 
-cli-brain: ## Start Second Brain CLI
-	@echo -e "$(GREEN)🧠 Starting Second Brain CLI...$(NC)"
-	@python cli.py
+cli: ## Start a simple CLI interface for testing
+	@echo -e "$(GREEN)🧠 Second Brain CLI Interface$(NC)"
+	@echo "Available endpoints:"
+	@echo "  Gateway: http://localhost:8000"
+	@echo "  Ingestion: http://localhost:8001" 
+	@echo "  Search: http://localhost:8002"
+	@echo "  Knowledge: http://localhost:8003"
+	@echo "  Chat: http://localhost:8004"
+	@echo ""
+	@echo "Example commands:"
+	@echo "  curl -X POST http://localhost:8001/ingest -H 'Content-Type: application/json' -d '{\"content\":\"Hello World\",\"source_type\":\"test\",\"source_path\":\"test.txt\"}'"
+	@echo "  curl -X POST http://localhost:8002/search -H 'Content-Type: application/json' -d '{\"query\":\"hello\"}'"
+	@echo "  curl -X POST http://localhost:8004/message -H 'Content-Type: application/json' -d '{\"content\":\"What do you know?\"}'"
 
 models: ## Download required ML models in container
 	@echo -e "$(GREEN)🤖 Downloading ML models in container...$(NC)"
