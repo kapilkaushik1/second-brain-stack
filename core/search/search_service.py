@@ -48,7 +48,7 @@ class SearchService:
                 raise ValueError(f"Unknown search type: {search_type}")
                 
         except Exception as e:
-            self.logger.error("Search failed", error=str(e), query=query)
+            self.logger.error(f"Error: {str(e), query=query)
             return []
     
     async def _fulltext_search(self, query: str, limit: int, offset: int) -> List[Dict[str, Any]]:
@@ -93,7 +93,7 @@ class SearchService:
                 return results
                 
         except Exception as e:
-            self.logger.error("Full-text search failed", error=str(e))
+            self.logger.error(f"Error: {str(e))
             # Fallback to simple document retrieval
             return await self._simple_search(query, limit, offset)
     
@@ -141,5 +141,5 @@ class SearchService:
             return results[:limit]
             
         except Exception as e:
-            self.logger.error("Simple search failed", error=str(e))
+            self.logger.error(f"Error: {str(e))
             return []

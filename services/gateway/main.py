@@ -49,9 +49,9 @@ async def health():
                 if response.status_code == 200:
                     health_status["services"][service_name] = "healthy"
                 else:
-                    health_status["services"][service_name] = f"unhealthy ({response.status_code})"
+                    health_status["services"][service_name] = f"unhealthy ({response.status_code}"
             except Exception as e:
-                health_status["services"][service_name] = f"error ({str(e)})"
+                health_status["services"][service_name] = f"error ({str(e)}"
     
     return health_status
 

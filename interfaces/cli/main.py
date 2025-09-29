@@ -28,6 +28,9 @@ logger = get_logger("CLI")
 @click.pass_context
 def main(ctx: click.Context, config: Optional[str], debug: bool):
     """Second Brain Stack CLI - Manage your knowledge base."""
+    # Store in context for subcommands first
+    ctx.ensure_object(dict)
+    
     if ctx.invoked_subcommand is None:
         console.print(Panel.fit(
             "[bold blue]Second Brain Stack CLI[/bold blue]\n\n"
@@ -38,21 +41,26 @@ def main(ctx: click.Context, config: Optional[str], debug: bool):
         return
     
     # Configure settings based on options
-    settings = get_settings()
-    
-    if debug:
-        settings.debug = True
-    
-    if config:
-        # Load custom config
-        settings = Settings.from_yaml(config)
-    
-    # Create necessary directories
-    settings.create_directories()
-    
-    # Store in context for subcommands
-    ctx.ensure_object(dict)
-    ctx.obj['settings'] = settings
+    try:
+        if config:
+            # Load custom config
+            settings = Settings.from_yaml(config)
+        else:
+            settings = get_settings()
+        
+        if debug:
+            settings.debug = True
+        
+        # Create necessary directories
+        settings.create_directories()
+        
+        # Store settings in context
+        ctx.obj['settings'] = settings
+        
+    except Exception as e:
+        console.print(f"[red]Configuration error: {str(e)}[/red]")
+        logger.error(f"Configuration failed: {str(e)}")
+        ctx.exit(1)
 
 
 @main.group()
@@ -113,7 +121,7 @@ async def _run_ingestion(source: str, path: str, recursive: bool, batch_size: in
         
     except Exception as e:
         console.print(f"[red]Ingestion failed: {str(e)}[/red]")
-        logger.error("Ingestion failed", error=str(e))
+        logger.error(f"Ingestion failed: {str(e)}")
 
 
 async def _ingest_filesystem(db: DatabaseManager, path: str, recursive: bool, 
@@ -139,7 +147,7 @@ async def _ingest_filesystem(db: DatabaseManager, path: str, recursive: bool,
                 processed += 1
             progress.advance(task)
         except Exception as e:
-            logger.error("Failed to process file", file=str(file_path), error=str(e))
+            logger.error(f"Failed to process file {str(file_path)}: {str(e)}")
     
     console.print(f"[green]Processed {processed} files successfully[/green]")
 
@@ -204,7 +212,7 @@ async def _run_search(query: str, limit: int, search_type: str, threshold: float
             
     except Exception as e:
         console.print(f"[red]Search failed: {str(e)}[/red]")
-        logger.error("Search failed", error=str(e))
+        logger.error(f"Search failed: {str(e)}")
 
 
 def _display_search_results(results):

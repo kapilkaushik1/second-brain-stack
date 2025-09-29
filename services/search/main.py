@@ -73,7 +73,7 @@ async def search_get(
         )
         
     except Exception as e:
-        logger.error("Search failed", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
 
@@ -96,7 +96,7 @@ async def search_post(request: SearchRequest):
         )
         
     except Exception as e:
-        logger.error("Search failed", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
 
@@ -146,7 +146,7 @@ async def get_search_suggestions(
         }
         
     except Exception as e:
-        logger.error("Suggestion failed", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Suggestion failed: {str(e)}")
 
 

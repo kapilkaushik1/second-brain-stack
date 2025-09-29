@@ -112,7 +112,7 @@ async def send_message(message: ChatMessage):
                     "source": result["source_path"]
                 })
                 
-                response_parts.append(f"\n{i}. **{result['title']}** (Score: {result['score']:.2f})")
+                response_parts.append(f"\n{i}. **{result['title']}** (Score: {result['score']:.2f}")
                 response_parts.append(f"   From: {result['source_path']}")
                 
                 # Add relevant excerpt
@@ -145,7 +145,7 @@ async def send_message(message: ChatMessage):
         )
         
     except Exception as e:
-        logger.error("Chat message failed", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
 
 
@@ -165,7 +165,7 @@ async def get_sessions():
         return sessions
         
     except Exception as e:
-        logger.error("Failed to get sessions", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to get sessions: {str(e)}")
 
 
@@ -187,7 +187,7 @@ async def get_session_history(session_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error("Failed to get session history", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to get session history: {str(e)}")
 
 
@@ -205,7 +205,7 @@ async def delete_session(session_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error("Failed to delete session", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to delete session: {str(e)}")
 
 

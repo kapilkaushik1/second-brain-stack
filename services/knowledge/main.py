@@ -72,7 +72,7 @@ async def get_entities(
         return response
         
     except Exception as e:
-        logger.error("Failed to get entities", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to get entities: {str(e)}")
 
 
@@ -100,7 +100,7 @@ async def get_relationships(limit: int = 50, offset: int = 0):
         return response
         
     except Exception as e:
-        logger.error("Failed to get relationships", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to get relationships: {str(e)}")
 
 
@@ -153,7 +153,7 @@ async def get_knowledge_graph(
         }
         
     except Exception as e:
-        logger.error("Failed to get knowledge graph", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to get knowledge graph: {str(e)}")
 
 
@@ -170,7 +170,7 @@ async def get_knowledge_stats():
         }
         
     except Exception as e:
-        logger.error("Failed to get knowledge stats", error=str(e))
+        logger.error(f"Error: {str(e))
         raise HTTPException(status_code=500, detail=f"Failed to get knowledge stats: {str(e)}")
 
 

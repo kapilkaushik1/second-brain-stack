@@ -6,7 +6,8 @@ from pathlib import Path
 from typing import List, Optional, Set
 
 from core.database.models import Document
-from core.utils import get_logger, settings
+from core.utils import get_logger
+from core.utils.config import get_settings
 
 
 class FilesystemScanner:
@@ -14,13 +15,12 @@ class FilesystemScanner:
     
     def __init__(self, supported_types: Optional[List[str]] = None):
         self.logger = get_logger(self.__class__.__name__)
+        settings = get_settings()
         self.supported_types = set(supported_types or settings.connectors.supported_file_types)
         self.ignore_patterns = set(settings.connectors.ignore_patterns)
         
         self.logger.info(
-            "FilesystemScanner initialized",
-            supported_types=list(self.supported_types),
-            ignore_patterns=list(self.ignore_patterns)
+            f"FilesystemScanner initialized with {len(self.supported_types)} supported types"
         )
     
     async def scan_directory(self, directory: Path, recursive: bool = True) -> List[Path]:
@@ -40,19 +40,14 @@ class FilesystemScanner:
                     files.append(file_path)
             
             self.logger.info(
-                "Directory scan completed",
-                directory=str(directory),
-                recursive=recursive,
-                files_found=len(files)
+                f"Directory scan completed: {directory}, recursive={recursive}, files_found={len(files)}"
             )
             
             return files
             
         except Exception as e:
             self.logger.error(
-                "Directory scan failed",
-                directory=str(directory),
-                error=str(e)
+                f"Directory scan failed: {directory}, error: {str(e)}"
             )
             raise
     
@@ -74,22 +69,18 @@ class FilesystemScanner:
         # Check file size (basic check)
         try:
             # Convert max size from string like "50MB" to bytes
+            settings = get_settings()
             max_size_str = settings.connectors.max_file_size
             max_size = self._parse_size_string(max_size_str)
             
             if file_path.stat().st_size > max_size:
                 self.logger.warning(
-                    "File too large, skipping",
-                    file=str(file_path),
-                    size=file_path.stat().st_size,
-                    max_size=max_size
+                    f"File too large, skipping: {file_path}, size: {file_path.stat().st_size}, max: {max_size}"
                 )
                 return False
         except Exception as e:
             self.logger.warning(
-                "Could not check file size",
-                file=str(file_path),
-                error=str(e)
+                f"Could not check file size: {file_path}, error: {str(e)}"
             )
         
         return True
@@ -126,7 +117,7 @@ class FilesystemScanner:
             # Read file content
             content = await self._read_file_content(file_path)
             if not content.strip():
-                self.logger.debug("Empty file, skipping", file=str(file_path))
+                self.logger.debug(f"Empty file, skipping: {file_path}")
                 return None
             
             # Generate content hash
@@ -157,20 +148,14 @@ class FilesystemScanner:
             )
             
             self.logger.debug(
-                "Document created from file",
-                file=str(file_path),
-                title=title,
-                content_length=len(content),
-                word_count=document.word_count
+                f"Document created from file: {file_path}, title: {title}, length: {len(content)}, words: {document.word_count}"
             )
             
             return document
             
         except Exception as e:
             self.logger.error(
-                "Failed to process file",
-                file=str(file_path),
-                error=str(e)
+                f"Failed to process file: {file_path}, error: {str(e)}"
             )
             return None
     
@@ -185,10 +170,7 @@ class FilesystemScanner:
                     content = f.read()
                 
                 self.logger.debug(
-                    "File read successfully",
-                    file=str(file_path),
-                    encoding=encoding,
-                    length=len(content)
+                    f"File read successfully: {file_path}, encoding: {encoding}, length: {len(content)}"
                 )
                 
                 return content
@@ -197,10 +179,7 @@ class FilesystemScanner:
                 continue
             except Exception as e:
                 self.logger.error(
-                    "Failed to read file",
-                    file=str(file_path),
-                    encoding=encoding,
-                    error=str(e)
+                    f"Failed to read file: {file_path}, encoding: {encoding}, error: {str(e)}"
                 )
                 continue
         
@@ -211,19 +190,14 @@ class FilesystemScanner:
                 content = raw_content.decode('utf-8', errors='ignore')
             
             self.logger.warning(
-                "File read with error handling",
-                file=str(file_path),
-                original_size=len(raw_content),
-                decoded_size=len(content)
+                f"File read with error handling: {file_path}, original_size: {len(raw_content)}, decoded_size: {len(content)}"
             )
             
             return content
             
         except Exception as e:
             self.logger.error(
-                "Failed to read file in any encoding",
-                file=str(file_path),
-                error=str(e)
+                f"Failed to read file in any encoding: {file_path}, error: {str(e)}"
             )
             raise
     
@@ -265,9 +239,7 @@ class FilesystemScanner:
         
         except Exception as e:
             self.logger.error(
-                "Failed to get directory stats",
-                directory=str(directory),
-                error=str(e)
+                f"Failed to get directory stats: {directory}, error: {str(e)}"
             )
         
         return stats
